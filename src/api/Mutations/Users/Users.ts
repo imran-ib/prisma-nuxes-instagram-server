@@ -77,8 +77,8 @@ export const USERS = (t: ObjectDefinitionBlock<"Mutation">) => {
           where: { email: args.email },
           data: { loginSecret: Secret }
         });
-
-        Mails.LoginSecreteMail(UpdatedUser, Secret);
+        //TODO Uncomment it
+        // Mails.LoginSecreteMail(UpdatedUser, Secret);
         return UpdatedUser;
       } catch (error) {
         throw new Error(`Unable To Create Key ${error.message}`);
@@ -105,6 +105,12 @@ export const USERS = (t: ObjectDefinitionBlock<"Mutation">) => {
           where: { email: args.email },
           data: { loginSecret: null }
         });
+        // set JWT as cookie on the response
+        ctx.response.cookie("Token", Token, {
+          httpOnly: true,
+          maxAge: 1000 * 60 * 60 * 24 * 365 // 1year cookie
+        });
+
         return Token;
       } catch (error) {
         throw new Error(`Unable Verify Key ${error.message}`);
@@ -154,5 +160,13 @@ export const USERS = (t: ObjectDefinitionBlock<"Mutation">) => {
         }
       }
     )
+  });
+  t.field("UserLogout", {
+    type: "String",
+    description: "Clear Cookies On Logout",
+    resolve: (parent: any, args: any, ctx: Context, info: any) => {
+      ctx.response.clearCookie("Token");
+      return "Goodbye!";
+    }
   });
 };

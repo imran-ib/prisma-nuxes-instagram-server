@@ -22,45 +22,44 @@ export const SEARCH = (t: ObjectDefinitionBlock<"Query">) => {
       ): Promise<User[]> => {
         try {
           let Term: string = args.term.toLowerCase();
-          console.log("SEARCH -> Term", Term);
+
           const UpperCaseTerm: string = Term.toUpperCase();
-          console.log("SEARCH -> UpperCaseTerm", UpperCaseTerm);
+
           const FirstLetterUpper: string = capitalizeFirstLetter(Term);
-          console.log("SEARCH -> FirstLetterUpper", FirstLetterUpper);
 
           const Users: User[] = await prisma.user.findMany({
             where: {
               OR: [
                 {
                   firstName: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
                 },
                 {
                   email: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
                 },
                 {
                   lastName: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
                 },
                 {
                   fullName: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
-                }
-              ]
-            }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
+                },
+              ],
+            },
           });
-          console.log("SEARCH -> Users", Users);
+
           return Users;
         } catch (error) {
           throw new Error(`Unable To Complete Search ${error.message}`);
         }
       }
-    )
+    ),
   });
   t.list.field("SearchPost", {
     type: "Post",
@@ -80,26 +79,27 @@ export const SEARCH = (t: ObjectDefinitionBlock<"Query">) => {
           const FirstLetterUpper: string = capitalizeFirstLetter(Term);
 
           const Posts: Post[] = await prisma.post.findMany({
+            include: { files: true },
             where: {
               OR: [
                 {
                   caption: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
                 },
                 {
                   location: { contains: FirstLetterUpper } || {
-                      contains: UpperCaseTerm
-                    } || { contains: Term }
-                }
-              ]
-            }
+                      contains: UpperCaseTerm,
+                    } || { contains: Term },
+                },
+              ],
+            },
           });
           return Posts;
         } catch (error) {
           throw new Error(`Unable To Complete Search ${error.message}`);
         }
       }
-    )
+    ),
   });
 };

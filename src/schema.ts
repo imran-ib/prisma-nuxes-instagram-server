@@ -1,5 +1,5 @@
 import { nexusPrismaPlugin } from "nexus-prisma";
-import { makeSchema, subscriptionField } from "@nexus/schema";
+import { makeSchema, subscriptionField, connectionPlugin } from "@nexus/schema";
 import {
   User,
   Post,
@@ -7,7 +7,7 @@ import {
   Comment,
   File,
   Room,
-  Message
+  Message,
 } from "./api/Models/Modles";
 import { Query } from "./api/Queries/Queries";
 import { Mutation } from "./api/Mutations/Mutations";
@@ -24,24 +24,36 @@ export const schema = makeSchema({
     Comment,
     File,
     Room,
-    Message
+    Message,
   ],
-  plugins: [nexusPrismaPlugin()],
+  plugins: [
+    nexusPrismaPlugin(),
+
+    connectionPlugin({
+      typePrefix: "Analytics",
+      nexusFieldName: "analyticsConnection",
+      extendConnection: {
+        totalCount: { type: "Int" },
+        avgDuration: { type: "Int" },
+      },
+    }),
+    connectionPlugin({}),
+  ],
   outputs: {
     schema: __dirname + "/../schema.graphql",
-    typegen: __dirname + "/generated/nexus.ts"
+    typegen: __dirname + "/generated/nexus.ts",
   },
   typegenAutoConfig: {
     contextType: "Context.Context",
     sources: [
       {
         source: "@prisma/client",
-        alias: "prisma"
+        alias: "prisma",
       },
       {
         source: require.resolve("./context"),
-        alias: "Context"
-      }
-    ]
-  }
+        alias: "Context",
+      },
+    ],
+  },
 });

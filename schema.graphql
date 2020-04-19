@@ -5,10 +5,12 @@
 type Comment {
   author: User!
   authorId: String!
+  createdAt: DateTime!
   id: String!
   post: Post!
   postId: String!
   text: String!
+  updatedAt: DateTime!
 }
 
 input CommentCreateManyWithoutAuthorInput {
@@ -161,10 +163,12 @@ input DateTimeFilter {
 }
 
 type File {
+  createdAt: DateTime!
   file: String!
   id: String!
   post: Post!
   postId: String!
+  updatedAt: DateTime!
 }
 
 input FileCreateManyWithoutPostInput {
@@ -255,9 +259,11 @@ input FileWhereUniqueInput {
 }
 
 type Like {
+  createdAt: DateTime!
   id: String!
   post: Post!
   postId: String!
+  updatedAt: DateTime!
   user: User!
   userId: String!
 }
@@ -392,6 +398,7 @@ input LikeWhereUniqueInput {
 }
 
 type Message {
+  createdAt: DateTime!
   id: String!
   receiver: User!
   receiverId: String!
@@ -400,6 +407,7 @@ type Message {
   sender: User!
   senderId: String!
   text: String!
+  updatedAt: DateTime!
 }
 
 input MessageCreateManyWithoutReceiverInput {
@@ -638,6 +646,9 @@ type Mutation {
   """Like Or Remove Like Post"""
   ToggleLikePost(postId: String!): String!
   updateOneUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+
+  """Clear Cookies On Logout"""
+  UserLogout: String!
 }
 
 input NullableStringFilter {
@@ -654,12 +665,22 @@ input NullableStringFilter {
   startsWith: String
 }
 
+enum OrderByArg {
+  asc
+  desc
+}
+
 type Post {
   author: User!
   authorId: String!
   caption: String!
+  comments(after: CommentWhereUniqueInput, before: CommentWhereUniqueInput, first: Int, last: Int, skip: Int): [Comment!]!
+  createdAt: DateTime!
+  files(after: FileWhereUniqueInput, before: FileWhereUniqueInput, first: Int, last: Int, skip: Int): [File!]!
   id: String!
+  likes(after: LikeWhereUniqueInput, before: LikeWhereUniqueInput, first: Int, last: Int, skip: Int): [Like!]!
   location: String
+  updatedAt: DateTime!
 }
 
 input PostCreateManyWithoutAuthorInput {
@@ -714,6 +735,16 @@ input PostFilter {
   every: PostWhereInput
   none: PostWhereInput
   some: PostWhereInput
+}
+
+input PostOrderByInput {
+  author: OrderByArg
+  authorId: OrderByArg
+  caption: OrderByArg
+  createdAt: OrderByArg
+  id: OrderByArg
+  location: OrderByArg
+  updatedAt: OrderByArg
 }
 
 input PostScalarWhereInput {
@@ -845,12 +876,16 @@ input PostWhereUniqueInput {
 }
 
 type Query {
+  """Get All Comments for One Post"""
+  Comments(postId: String!): [Comment!]
+
   """Current User"""
   CurrentUser: User
-  Feeds: [Post!]!
+  Feeds(after: String, before: String, first: Int, last: Int, skip: Int): [Post!]!
 
   """Get Single Post"""
   Post(postId: String!): Post
+  posts(after: PostWhereUniqueInput, before: PostWhereUniqueInput, first: Int, last: Int, orderBy: PostOrderByInput, skip: Int, where: PostWhereInput): [Post!]!
 
   """Get Single Room"""
   Room(roomId: String!): Room!
@@ -863,9 +898,11 @@ type Query {
 }
 
 type Room {
+  createdAt: DateTime!
   id: String!
   messeges(after: MessageWhereUniqueInput, before: MessageWhereUniqueInput, first: Int, last: Int, skip: Int): [Message!]!
   participants(after: UserWhereUniqueInput, before: UserWhereUniqueInput, first: Int, last: Int, skip: Int): [User!]!
+  updatedAt: DateTime!
 }
 
 input RoomCreateManyWithoutParticipantsInput {
@@ -1006,6 +1043,7 @@ type Subscription {
 type User {
   avatar: String
   bio: String!
+  createdAt: DateTime!
   email: String!
   firstName: String
   followedBy(after: UserWhereUniqueInput, before: UserWhereUniqueInput, first: Int, last: Int, skip: Int): [User!]!
@@ -1016,6 +1054,8 @@ type User {
   likes(after: LikeWhereUniqueInput, before: LikeWhereUniqueInput, first: Int, last: Int, skip: Int): [Like!]!
   posts: [Post!]!
   rooms(after: RoomWhereUniqueInput, before: RoomWhereUniqueInput, first: Int, last: Int, skip: Int): [Room!]!
+  updatedAt: DateTime!
+  username: String!
 }
 
 input UserCreateManyWithoutFollowedByInput {

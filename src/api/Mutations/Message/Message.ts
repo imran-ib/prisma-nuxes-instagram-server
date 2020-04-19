@@ -14,7 +14,7 @@ export const MESSAGE = (t: ObjectDefinitionBlock<"Mutation">) => {
     args: {
       roomId: stringArg(),
       text: stringArg(),
-      toId: stringArg()
+      toId: stringArg(),
     },
     resolve: AuthResolver(
       async (
@@ -36,21 +36,20 @@ export const MESSAGE = (t: ObjectDefinitionBlock<"Mutation">) => {
               include: { participants: true },
               data: {
                 participants: {
-                  connect: [{ id: user.id }, { id: args.toId }]
-                }
-              }
+                  connect: [{ id: user.id }, { id: args.toId }],
+                },
+              },
             });
           } else {
             chatRoom = await prisma.room.findOne({
               include: { participants: true },
               where: {
-                id: args.roomId
-              }
+                id: args.roomId,
+              },
             });
           }
           if (!chatRoom) throw Error(`Room Not Found`);
 
-          console.log("MESSAGE -> chatRoom", chatRoom);
           const GetId =
             chatRoom.participants &&
             chatRoom.participants.filter(
@@ -63,23 +62,22 @@ export const MESSAGE = (t: ObjectDefinitionBlock<"Mutation">) => {
               text: args.text,
               receiver: {
                 connect: {
-                  id: user.id
-                }
+                  id: user.id,
+                },
               },
               sender: {
                 connect: {
-                  id: args.roomId ? GetId && GetId.id : args.toId
-                }
+                  id: args.roomId ? GetId && GetId.id : args.toId,
+                },
               },
               room: {
                 connect: {
-                  id: chatRoom.id
-                }
-              }
-            }
+                  id: chatRoom.id,
+                },
+              },
+            },
           });
           NewMessage.ROOMID = chatRoom.id;
-          console.log("MESSAGE -> NewMessage", NewMessage);
 
           ctx.pubsub.publish(MESSAGE_CHANNEL, { newMessage: NewMessage });
 
@@ -88,6 +86,6 @@ export const MESSAGE = (t: ObjectDefinitionBlock<"Mutation">) => {
           throw Error(`Some went Wrong ${error.message}`);
         }
       }
-    )
+    ),
   });
 };

@@ -10,13 +10,21 @@ export const User = objectType({
     t.model.firstName();
     t.model.lastName();
     t.model.fullName();
+    t.model.username();
     t.model.followedBy();
     t.model.following();
-    t.model.likes(), t.model.rooms();
-    t.model.posts({
-      pagination: false
+    t.model.likes({
+      type: "Like",
     });
-  }
+    t.model.rooms({
+      type: "Room",
+    });
+    t.model.posts({
+      pagination: false,
+    });
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });
 
 export const Post = objectType({
@@ -25,41 +33,97 @@ export const Post = objectType({
     t.model.id();
     t.model.caption();
     t.model.location();
-    t.model.author();
+    t.model.author({
+      type: "User",
+    });
     t.model.authorId();
-    t.model.files;
-  }
+    t.model.comments({
+      type: "Comment",
+    });
+    t.model.likes({
+      type: "Like",
+    });
+
+    t.model.files({
+      type: "File",
+    });
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
+});
+export const Feeds = objectType({
+  name: "Feeds",
+  definition(t) {
+    t.model("Post").id();
+    t.model("Post").caption();
+    t.model("Post").location();
+    t.model("Post").author({
+      type: "User",
+    });
+    t.model("Post").authorId();
+    t.model("Post").comments({
+      type: "Comment",
+      ordering: { createdAt: true },
+    });
+    t.model("Post").likes({
+      type: "Like",
+    });
+
+    t.model("Post").files({
+      type: "File",
+    });
+
+    t.model("Post").createdAt();
+    t.model("Post").updatedAt();
+  },
 });
 
 export const Like = objectType({
   name: "Like",
   definition(t) {
     t.model.id();
-    t.model.post();
+    t.model.post({
+      type: "Post",
+    });
     t.model.postId();
-    t.model.user();
+    t.model.user({
+      type: "User",
+    });
+
     t.model.userId();
-  }
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });
 export const Comment = objectType({
   name: "Comment",
   definition(t) {
     t.model.id();
     t.model.text();
-    t.model.author();
+    t.model.author({
+      type: "User",
+    });
     t.model.authorId();
-    t.model.post();
+    t.model.post({
+      type: "Post",
+    });
     t.model.postId();
-  }
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });
 export const File = objectType({
   name: "File",
   definition(t) {
     t.model.id();
     t.model.file();
-    t.model.post();
+    t.model.post({
+      type: "Post",
+    });
     t.model.postId();
-  }
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });
 export const Room = objectType({
   name: "Room",
@@ -67,7 +131,9 @@ export const Room = objectType({
     t.model.id();
     t.model.messeges();
     t.model.participants();
-  }
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });
 export const Message = objectType({
   name: "Message",
@@ -80,5 +146,7 @@ export const Message = objectType({
     t.model.receiverId();
     t.model.room();
     t.model.RoomId();
-  }
+    t.model.createdAt();
+    t.model.updatedAt();
+  },
 });

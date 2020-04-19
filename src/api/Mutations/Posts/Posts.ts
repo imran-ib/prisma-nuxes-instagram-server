@@ -11,7 +11,7 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
     args: {
       caption: stringArg({ required: true }),
       location: stringArg(),
-      files: stringArg({ list: true })
+      files: stringArg({ list: true }),
     },
     description: "Create A Single post With Auther and file Connection",
     resolve: AuthResolver(
@@ -29,16 +29,16 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
             data: {
               caption: args.caption,
               location: args.location,
-              author: { connect: { id: user.id } }
-            }
+              author: { connect: { id: user.id } },
+            },
           });
           args.files &&
             args.files.forEach(async (file: any) => {
               await prisma.file.create({
                 data: {
                   file: file,
-                  post: { connect: { id: Post.id } }
-                }
+                  post: { connect: { id: Post.id } },
+                },
               });
             });
 
@@ -47,7 +47,7 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
           throw new Error(`Unable To Create Post ${error.message}`);
         }
       }
-    )
+    ),
   });
   t.field("EditPost", {
     type: "Post",
@@ -55,7 +55,7 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
       postId: stringArg({ required: true }),
       caption: stringArg({ required: false }),
       location: stringArg({ required: false }),
-      files: stringArg({ list: true, required: false })
+      files: stringArg({ list: true, required: false }),
     },
     description: "Edit Post",
     resolve: AuthResolver(
@@ -73,10 +73,10 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
         try {
           const user: User = ctx.request.user;
           const POST = await prisma.post.findOne({
-            where: { id: args.postId }
+            where: { id: args.postId },
           });
           const FILES: File[] = await prisma.file.findMany({
-            where: { postId: args.postId }
+            where: { postId: args.postId },
           });
           if (!POST) throw new Error(`Post Not Found`);
           if (POST.authorId !== user.id)
@@ -85,19 +85,19 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
             where: { id: args.postId },
             data: {
               caption: args.caption,
-              location: args.location
-            }
+              location: args.location,
+            },
           });
 
           args.files &&
             args.files.forEach(async (file, i) => {
               await prisma.file.update({
                 where: {
-                  id: FILES[i].id
+                  id: FILES[i].id,
                 },
                 data: {
-                  file: file
-                }
+                  file: file,
+                },
               });
             });
           return EditedPost;
@@ -105,7 +105,7 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
           throw new Error(`Unable To Edit Post ${error.message}`);
         }
       }
-    )
+    ),
   });
   t.field("DeletePost", {
     type: "String",
@@ -122,7 +122,7 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
           const user: User = ctx.request.user;
 
           const Post: Post | null = await prisma.post.findOne({
-            where: { id: args.postId }
+            where: { id: args.postId },
           });
           if (!Post) throw new Error(`Post not Found`);
 
@@ -135,16 +135,15 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
           await prisma.like.deleteMany({ where: { postId: args.postId } });
           await prisma.comment.deleteMany({ where: { postId: args.postId } });
           const DeletedPost = await prisma.post.delete({
-            where: { id: args.postId }
+            where: { id: args.postId },
           });
-          console.log("DeletedPost", DeletedPost);
 
           return "Success";
         } catch (error) {
           throw new Error(`Unable to complete The Action ${error.message}`);
         }
       }
-    )
+    ),
   });
   t.field("ToggleLikePost", {
     type: "String",
@@ -162,21 +161,21 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
 
           const [Exists]: Like[] = await prisma.like.findMany({
             where: {
-              AND: [{ userId: user.id }, { postId: args.postId }]
-            }
+              AND: [{ userId: user.id }, { postId: args.postId }],
+            },
           });
           if (Exists) {
             await prisma.like.delete({
               where: {
-                id: Exists.id
-              }
+                id: Exists.id,
+              },
             });
           } else {
             await prisma.like.create({
               data: {
                 post: { connect: { id: args.postId } },
-                user: { connect: { id: user.id } }
-              }
+                user: { connect: { id: user.id } },
+              },
             });
           }
 
@@ -185,6 +184,6 @@ export const POSTS = (t: ObjectDefinitionBlock<"Mutation">) => {
           throw new Error(`Unable To Complete The Action ${error.message}`);
         }
       }
-    )
+    ),
   });
 };

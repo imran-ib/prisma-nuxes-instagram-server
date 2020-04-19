@@ -1,8 +1,9 @@
+import { Context } from "./../../context";
 //@ts-ignore
-const AuthResolver = resolverFunctions => async (
+const AuthResolver = (resolverFunctions) => async (
   parent: any,
   args: any,
-  ctx: { request: { user: any } },
+  ctx: Context,
   info: any
 ) => {
   const user = ctx.request.user;
