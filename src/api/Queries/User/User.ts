@@ -11,7 +11,7 @@ export const USERS = (t: ObjectDefinitionBlock<"Query">) => {
     nullable: true,
     resolve: async (
       __: any,
-      args: any,
+      _args: any,
       ctx: Context,
       _: any
     ): Promise<User | null> => {

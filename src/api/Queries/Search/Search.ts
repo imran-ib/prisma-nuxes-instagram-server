@@ -14,29 +14,28 @@ export const SEARCH = (t: ObjectDefinitionBlock<"Query">) => {
 
     args: { term: stringArg({ required: true }) },
     resolve: AuthResolver(
-      async (
-        __: any,
-        args: { term: string },
-        ctx: Context,
-        _: any
-      ): Promise<User[]> => {
+      async (__: any, args: { term: string }, ctx: Context, _: any) => {
         try {
+          if (
+            args.term === undefined ||
+            args.term === null ||
+            args.term == ""
+          ) {
+            return null;
+          }
           let Term: string = args.term.toLowerCase();
-
           const UpperCaseTerm: string = Term.toUpperCase();
-
           const FirstLetterUpper: string = capitalizeFirstLetter(Term);
-
           const Users: User[] = await prisma.user.findMany({
             where: {
               OR: [
                 {
-                  firstName: { contains: FirstLetterUpper } || {
+                  email: { contains: FirstLetterUpper } || {
                       contains: UpperCaseTerm,
                     } || { contains: Term },
                 },
                 {
-                  email: { contains: FirstLetterUpper } || {
+                  firstName: { contains: FirstLetterUpper } || {
                       contains: UpperCaseTerm,
                     } || { contains: Term },
                 },
@@ -53,6 +52,19 @@ export const SEARCH = (t: ObjectDefinitionBlock<"Query">) => {
               ],
             },
           });
+
+          Users &&
+            Users.length &&
+            Users.map(async (user) => {
+              await prisma.user.updateMany({
+                where: { id: { in: user.id } },
+                data: {
+                  postCount: await prisma.post.count({
+                    where: { authorId: user.id },
+                  }),
+                },
+              });
+            });
 
           return Users;
         } catch (error) {
@@ -72,8 +84,15 @@ export const SEARCH = (t: ObjectDefinitionBlock<"Query">) => {
         args: { term: string },
         ctx: Context,
         _: any
-      ): Promise<Post[]> => {
+      ): Promise<Post[] | null> => {
         try {
+          if (
+            args.term === undefined ||
+            args.term === null ||
+            args.term == ""
+          ) {
+            return null;
+          }
           let Term: string = args.term.toLowerCase();
           const UpperCaseTerm: string = Term.toUpperCase();
           const FirstLetterUpper: string = capitalizeFirstLetter(Term);

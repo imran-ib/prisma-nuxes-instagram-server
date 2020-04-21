@@ -20,8 +20,15 @@ export const User = objectType({
       type: "Room",
     });
     t.model.posts({
+      type: "Post",
+      filtering: true,
+      ordering: true,
       pagination: false,
     });
+    t.model.postCount();
+    t.model.likeCount();
+    t.model.CommentCount();
+
     t.model.createdAt();
     t.model.updatedAt();
   },
