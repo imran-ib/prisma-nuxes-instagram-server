@@ -38,7 +38,7 @@
     "sendgrid": "^5.2.3"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.13.2",
+    "@graphql-codegen/cli": "^1.21.8",
     "@graphql-codegen/typescript": "^1.13.2",
     "@graphql-codegen/typescript-resolvers": "^1.13.2",
     "@prisma/cli": "^2.0.0-beta.2",
